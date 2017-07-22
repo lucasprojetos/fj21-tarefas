@@ -3,7 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<link type="text/css" href="resources/css/tarefas.css" rel="stylesheet"/>
+<link type="text/css" href="resources/css/tarefas.css" rel="stylesheet" />
 <script type="text/javascript" src="resources/js/jquery.js"></script>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -13,16 +13,19 @@
 <body>
 	<script type="text/javascript">
 		function finalizaAgora(id) {
-			$.post("finalizaTarefa", {
-				'id' : id
-			}, function(resposta) {
-				$("#tarefa_" + id).html(resposta);
-			});
+			  $.post("finalizaTarefa", {'id' : id}, function(resposta) {
+				  
+				  var dataFinalizacao = new Date(resposta.dataFinalizacao);
+				  var dataFormatada = dataFinalizacao.toLocaleDateString("pt-BR");
+				  
+				    $("#finalizado_"+id).html("Finalizado");
+				    $("#dataFinalizacao_"+id).html(dataFormatada);
+				  }, "json");
 		}
 	</script>
 
-	<a href="novaTarefa">Criar nova tarefa</a>
-	Usuario atual:${usuarioLogado.login}
+	<a href="novaTarefa">Criar nova tarefa</a> Usuario
+	atual:${usuarioLogado.login}
 	<br />
 	<br />
 
@@ -43,11 +46,12 @@
 					<td>Finalizado</td>
 				</c:if>
 				<c:if test="${tarefa.finalizado eq false }">
-				<td><a href="#" onclick="finalizaAgora(${tarefa.id})">Finalizar</a></td>
-				
+					<td id="finalizado_${tarefa.id}"><a href="#"
+						onclick="finalizaAgora(${tarefa.id})">Finalizar</a></td>
+
 				</c:if>
-				<td><fmt:formatDate value="${tarefa.dataFinalizacao.time}"
-						pattern="dd/MM/yyyy" /></td>
+				<td id="dataFinalizacao_${tarefa.id}"><fmt:formatDate
+						value="${tarefa.dataFinalizacao.time}" pattern="dd/MM/yyyy" /></td>
 
 				<td><a href="removeTarefa?id=${tarefa.id}">Remover</a></td>
 				<td><a href="mostraTarefa?id=${tarefa.id}">Alterar</a></td>

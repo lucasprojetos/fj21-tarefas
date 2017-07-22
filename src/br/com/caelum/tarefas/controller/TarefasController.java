@@ -1,5 +1,9 @@
 package br.com.caelum.tarefas.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,19 +11,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import br.com.caelum.tarefas.dao.JdbcTarefaDao;
+import br.com.caelum.tarefas.dao.TarefaDao;
 import br.com.caelum.tarefas.modelo.Tarefa;
 
+@Transactional
 @Controller
 public class TarefasController {
 	
-	private final JdbcTarefaDao dao;
-	
 	@Autowired
-	public TarefasController(JdbcTarefaDao dao){
-		this.dao=dao;
-	}
+	TarefaDao dao;
 	
 	@RequestMapping("novaTarefa")
 	public String form(){
@@ -63,9 +65,17 @@ public class TarefasController {
 	}
 	
 	@RequestMapping("finalizaTarefa")
-	public String finaliza(Long id, Model model){
+	public @ResponseBody Tarefa finaliza(Long id, Model model){
 		dao.finaliza(id);
 		model.addAttribute("tarefa", dao.buscaPorId(id));
-		return "tarefa/finalizada";
+		return dao.buscaPorId(id);
+	}
+	
+	@RequestMapping("lista2")
+	public @ResponseBody List<Tarefa> lista2(Model model, HttpServletResponse httpServletResponse){
+		httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+		model.addAttribute("tarefas", dao.lista());
+		return dao.lista();
+		
 	}
 }
